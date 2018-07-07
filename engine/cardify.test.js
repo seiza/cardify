@@ -8,7 +8,9 @@ const lines = [
     '/ Avancement de chacun => standup, chaque jour',
     '* Amélioration du produit => planning game, chaque sprint',
     '- Amélioration du fonctionnement => rétro, chaque sprint',
-    '- VALEURS (pour garder le cap)'
+    '- VALEURS (pour garder le cap)',
+    '- [ ] Créativité',
+    '- [x] Collaboration / co-construction',
 ];
 
 describe('parse()', function () {
@@ -22,11 +24,24 @@ describe('parse()', function () {
         expect(cardify.parseTitle(lines[6])).to.be.equal('VALEURS (pour garder le cap)');
     });
 
+    it('should parse action titles', function () {
+        const cardify = new Cardify();
+        expect(cardify.parseTitle(lines[7])).to.be.equal('Créativité');
+        expect(cardify.parseTitle(lines[8])).to.be.equal('Collaboration / co-construction');
+    });
+
+    it('should parse DONE status from title', function () {
+        const cardify = new Cardify();
+        expect(cardify.parseDone(lines[6])).to.be.equal(undefined);
+        expect(cardify.parseDone(lines[7])).to.be.false;
+        expect(cardify.parseDone(lines[8])).to.be.true;
+    });
+
     it('should return cards with epic for sub cards', function () {
         const cardify = new Cardify();
         const cards = cardify.parse(lines);
 
-        expect(cards).to.have.lengthOf(5);
+        expect(cards).to.have.lengthOf(7);
 
         expect(cards[0].title).to.be.equal(lines[0]);
         expect(cards[0].epic).to.be.equal(undefined);
@@ -42,6 +57,15 @@ describe('parse()', function () {
 
         expect(cards[4].title).to.be.equal('VALEURS (pour garder le cap)');
         expect(cards[4].epic).to.be.equal(lines[2]);
+        expect(cards[4].done).to.be.equal(undefined);
+
+        expect(cards[5].title).to.be.equal('Créativité');
+        expect(cards[5].epic).to.be.equal(lines[2]);
+        expect(cards[5].done).to.be.false;
+
+        expect(cards[6].title).to.be.equal('Collaboration / co-construction');
+        expect(cards[6].epic).to.be.equal(lines[2]);
+        expect(cards[6].done).to.be.true;
     });
 
 });

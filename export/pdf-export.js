@@ -30,7 +30,9 @@ module.exports.exportCardsAsPdf = function (cards) {
     const titleFont = 15;
     const subtitleFont = 10;
 
-    cards.forEach(card => {
+    cards
+    .filter(c => c.done !== true)
+    .forEach(card => {
         doc.rect(pX + x*w, pY + y*h, w, h).stroke();
 
         doc.fontSize(titleFont);

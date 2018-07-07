@@ -1,6 +1,7 @@
 var Card = require('./card');
 
 const bullets = ['/ ', '* ', '- '];
+const actions = ['[ ] ', '[x] '];
 
 class Cardify {
 
@@ -13,11 +14,22 @@ class Cardify {
     // get name() {
     //     return this._name;
     // }
+
     parseTitle(title) {
         if (bullets.indexOf(title.substr(0, 2)) >= 0) {
-            return title.substr(2);
+            title = title.substr(2);
+            if (actions.indexOf(title.substr(0, 4)) >= 0) {
+                title = title.substr(4);
+            }
         }
         return title;
+    }
+
+    parseDone(title) {
+        const status = title.substr(0, 6);
+        if (status == '- [ ] ') { return false; }
+        if (status == '- [x] ') { return true; }
+        return undefined;
     }
 
     parse(lines) {
@@ -32,6 +44,7 @@ class Cardify {
                     epic = previous.title;
                 }
                 let card = new Card(title, epic);
+                card.done = this.parseDone(l);
                 if (title === l) {
                     previous = card;
                 }
