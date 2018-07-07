@@ -1,0 +1,11 @@
+{
+  "name": "cardify",
+  "version": "1.0.0",
+  "description": "Parse file to create card for each line.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "jacques@inagua.ch",
+  "license": "ISC"
+}
