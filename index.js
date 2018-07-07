@@ -1,4 +1,6 @@
 const fs = require('fs');
+const Cardify = require('./engine/cardify');
+const pdf = require('./export/pdf-export');
 
 const readFileAsLines = function(path, errorCB, successCB) {
     fs.readFile(path, 'utf8', (error, data) => {
@@ -12,7 +14,9 @@ const readFileAsLines = function(path, errorCB, successCB) {
 };
 
 const linesHandler = function(lines) {
-    lines.forEach(l => console.log('> ', l));
+    const cardify = new Cardify();
+    const cards = cardify.parse(lines);
+    pdf.exportCardsAsPdf(cards);
 }
 
 readFileAsLines('./notes.tmp.txt', undefined, linesHandler);
