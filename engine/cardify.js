@@ -1,18 +1,16 @@
+var Card = require('./card');
+
 class Cardify {
-    constructor() {
-        this.id = 'id_1';
-    }
-    set name(name) {
-        this._name = name.charAt(0).toUpperCase() + name.slice(1);
-    }
-    get name() {
-        return this._name;
-    }
-    sayHello() {
-        console.log('Hello, my name is ' + this.name + ', I have ID: ' + this.id);
-    }
-    addTwoNumbers(x, y) {
-        return x + y;
+
+    constructor() {}
+    // set name(name) {
+    //     this._name = name.charAt(0).toUpperCase() + name.slice(1);
+    // }
+    // get name() {
+    //     return this._name;
+    // }
+    parse(lines) {
+        return lines.filter(l => l && l.length > 0).map(l => new Card(l));
     }
 }
 module.exports = Cardify;
