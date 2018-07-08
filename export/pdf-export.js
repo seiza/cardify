@@ -29,17 +29,27 @@ module.exports.exportCardsAsPdf = function (cards) {
 
     const titleFont = 15;
     const subtitleFont = 10;
+    const descriptionFont = 12;
 
     cards
     .filter(c => c.done !== true)
     .forEach(card => {
         doc.rect(pX + x*w, pY + y*h, w, h).stroke();
 
-        doc.fontSize(titleFont);
-        doc.text(card.title, pX + x*w + cX, pY + y*h + cY, {width: (w - 2*cX), align: 'left'});
-        if (card.epic) {
-            doc.fontSize(subtitleFont);
-            doc.text(`(${card.epic.substr(0,30) + ( card.epic && card.epic.length > 30 ? '...' : '')})`);
+        let epic = card.epic;
+        epic = epic ? `(${epic.substr(0,40) + ( epic.length > 40 ? '...' : '')})` : ' ';
+        doc.fontSize(subtitleFont);
+        doc.text(epic, pX + x*w + cX, pY + y*h + cY, {width: (w - 2*cX), align: 'center', lineGap:10});
+
+        doc.fontSize(card.title.length < 85 ? titleFont : 12);
+        doc.text(card.title, {width: (w - 2*cX), align: 'left'});
+
+        if (card.description) {
+            doc.fontSize(descriptionFont);
+            doc.text(' ');
+            card.description.forEach(d => {
+                doc.text(d, {width: (w - 2*cX), align: 'left'});
+            });
         }
 
         x++;

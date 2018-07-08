@@ -16,12 +16,16 @@ class Cardify {
     // }
 
     parseTitle(title) {
+        if (!title || !title.trim()) {
+            return undefined;
+        }
         if (bullets.indexOf(title.substr(0, 2)) >= 0) {
             title = title.substr(2);
             if (actions.indexOf(title.substr(0, 4)) >= 0) {
                 title = title.substr(4);
             }
         }
+        title = title.split('|')[0].trim();
         return title;
     }
 
@@ -32,25 +36,38 @@ class Cardify {
         return undefined;
     }
 
+    parseDescription(title) {
+        let tail = title.split('|');
+        tail.splice(0, 1);
+        return tail.map(t => t.trim());
+    }
+
     parse(lines) {
         let previous;
         return lines
-            .filter(l => l && l.length > 0)
             .map(l => {
                 const title = this.parseTitle(l);
+                if (!title) {
+                    previous = undefined;
+                    return undefined;
+                }
                 let epic;
                 if (previous && title !== l) {
                     previous.remove = true;
                     epic = previous.title;
                 }
                 let card = new Card(title, epic);
+                let d = this.parseDescription(l);
+                if (d) {
+                    card.description = d;
+                }
                 card.done = this.parseDone(l);
                 if (title === l) {
                     previous = card;
                 }
                 return card;
             })
-            .filter(c => !c.remove)
+            .filter(c => c && c.title && !c.remove)
             ;
     }
 }
