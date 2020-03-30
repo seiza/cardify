@@ -2,17 +2,23 @@ const PDFDocument = require('pdfkit');
 const fs = require('fs');
 // const card = require('../engine/card');
 
-module.exports.exportCardsAsPdf = function (cards) {
+module.exports.exportCardsAsPdf = function (cards, filePath, options = {
+    cardWidth: 55,
+    cardHeight: 22,
+    titleFont: 9,
+    subtitleFont: 8,
+    descriptionFont: 8
+}) {
 
     // Create a document
     doc = new PDFDocument;
 
     // Pipe its output somewhere, like to a file or HTTP response
     // See below for browser usage
-    doc.pipe(fs.createWriteStream('output.tmp.pdf'));
+    doc.pipe(fs.createWriteStream(filePath));
 
     const pX = 50;
-    const pY = 50;
+    const pY = 40;
     const cX = 10;
     const cY = 10;
 
@@ -22,14 +28,14 @@ module.exports.exportCardsAsPdf = function (cards) {
     let x = 0;
     let y = 0;
 
-    const wmm = 74; /*mm*/
-    const hmm = 53; /*mm*/
+    const wmm = options.cardWidth || 74; /*mm*/
+    const hmm = options.cardHeight || 53; /*mm*/
     const w = Math.round(wmm * 200 / 66 /*mm*/);
     const h = Math.round(hmm * 100 / 33 /*mm*/);
 
-    const titleFont = 15;
-    const subtitleFont = 10;
-    const descriptionFont = 12;
+    const titleFont = options.titleFont || 12;
+    const subtitleFont = options.subtitleFont || 10;
+    const descriptionFont = options.descriptionFont || 12;
 
     cards
     .filter(c => c.done !== true)
@@ -39,9 +45,10 @@ module.exports.exportCardsAsPdf = function (cards) {
         let epic = card.epic;
         epic = epic ? `(${epic.substr(0,40) + ( epic.length > 40 ? '...' : '')})` : ' ';
         doc.fontSize(subtitleFont);
-        doc.text(epic, pX + x*w + cX, pY + y*h + cY, {width: (w - 2*cX), align: 'center', lineGap:10});
+        doc.text(epic, pX + x*w + cX/2, pY + y*h + cY, {width: (w - cX), align: 'center', lineGap:10});
 
-        doc.fontSize(card.title.length < 85 ? titleFont : 12);
+        // doc.fontSize(card.title.length < 85 ? titleFont : 10);
+        doc.fontSize(titleFont);
         doc.text(card.title, {width: (w - 2*cX), align: 'left'});
 
         if (card.description) {

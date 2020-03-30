@@ -4,6 +4,7 @@
   "description": "Parse file to create card for each line.",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "mocha engine"
   },
   "author": "jacques@inagua.ch",
