@@ -77,6 +77,26 @@ module.exports.exportCardsAsPdf = function (cards, filePath, options = {
 
     });
 
+    //
+    // Finish last page with empty cells and add 1 page with empty cells (to manually create cards)
+    //
+    let pageFinished = 0;
+    while (pageFinished < 2) {
+        doc.rect(pX + x*w, pY + y*h, w, h).stroke();
+        x++;
+        if ((x+1) * w > pW) {
+            x = 0;
+            y++;
+        }
+        if ((y+1) * h > pH) {
+            ++pageFinished;
+            if (pageFinished < 2) {
+                y = 0;
+                doc.addPage();
+            }
+        }
+    }
+
     // // Embed a font, set the font size, and render some text
     // doc/*.font('fonts/PalatinoBold.ttf')*/
     //     .fontSize(25)
