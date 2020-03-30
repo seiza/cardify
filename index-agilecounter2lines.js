@@ -26,6 +26,6 @@ const questions = flattenGroup(counter.assessment.questions.group);
 // questions.sort((a, b) => a.questionId.localeCompare(b.questionId)).forEach(q => console.log('>>>>> ', JSON.stringify(q)));
 console.log('>>>>> ', questions.length);
 
-const outputFile = 'agilecounter.pdf';
+const outputFile = 'export/agilecounter.tmp.pdf';
 const pdf = require('./export/pdf-export');
 pdf.exportCardsAsPdf(questions, outputFile);
