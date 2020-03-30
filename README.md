@@ -14,6 +14,14 @@ To launch unit tests:
 npm test engine
 ```
 
+# Agile Counter
+
+To export Agile Counter assessment:
+
+```
+node index-agilecounter2lines.js
+``` 
+
 # Resources
 
 - http://www.chaijs.com/api/bdd/#method_lengthof
