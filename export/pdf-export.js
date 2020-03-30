@@ -7,7 +7,8 @@ module.exports.exportCardsAsPdf = function (cards, filePath, options = {
     cardHeight: 22,
     titleFont: 9,
     subtitleFont: 8,
-    descriptionFont: 8
+    descriptionFont: 8,
+    withNumber: true
 }) {
 
     // Create a document
@@ -17,8 +18,8 @@ module.exports.exportCardsAsPdf = function (cards, filePath, options = {
     // See below for browser usage
     doc.pipe(fs.createWriteStream(filePath));
 
-    const pX = 50;
-    const pY = 40;
+    const pX = 50; // Horizontal padding for the the whole page
+    const pY = 40; // Vertical padding for the the whole page
     const cX = 10;
     const cY = 10;
 
@@ -39,7 +40,7 @@ module.exports.exportCardsAsPdf = function (cards, filePath, options = {
 
     cards
     .filter(c => c.done !== true)
-    .forEach(card => {
+    .forEach((card, i) => {
         doc.rect(pX + x*w, pY + y*h, w, h).stroke();
 
         let epic = card.epic;
@@ -57,6 +58,11 @@ module.exports.exportCardsAsPdf = function (cards, filePath, options = {
             card.description.forEach(d => {
                 doc.text(d, {width: (w - 2*cX), align: 'left'});
             });
+        }
+
+        if (options.withNumber) {
+            doc.fontSize(subtitleFont);
+            doc.text(i, pX + x*w + cX/2, pY + (y+1)*h - cY, {width: (w - cX), align: 'right', lineGap:10});
         }
 
         x++;
