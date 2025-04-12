@@ -1,5 +1,8 @@
 **export
 **.tmp**
+projects
+package-lock.json
+iliade-**.pdf
 
 
 # Created by https://www.gitignore.io/api/node,osx,textmate,webstorm,intellij
