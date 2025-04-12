@@ -136,8 +136,9 @@ class PDFy {
                         doc.text('', x, y, {...options, continued: true});
                         area.advancedText.forEach(token => {
                             if (token.highlight) {
+                                const color = token.highlight === 2 ? 'blue' : (token.highlight === 3 ? 'red' : 'black')
                                 doc
-                                    .fillColor('red')
+                                    .fillColor(color)
                                     .font('Times-Bold')
                                 ;
                             } else {
