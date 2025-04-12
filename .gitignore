@@ -1,5 +1,6 @@
 **export
 **.tmp**
+**_tmp**
 projects
 package-lock.json
 iliade-**.pdf

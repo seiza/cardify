@@ -20,12 +20,29 @@ class PDFCard {
 
 }
 
+class PDFyPlugin {
+
+    /**
+     * @return {text, x, y, w, align, fontSize}[]
+     */
+    apply(doc, card, cardIndex, context = {}) {
+        return this.doApply(doc, card, cardIndex, context);
+    }
+
+    doApply(doc, card, cardIndex, context = {}) {
+        throw Error('TO BE OVERLOADED!!!');
+    }
+
+}
+
 class PDFy {
 
     h;
     w;
     borders = [];
     options = {};
+    pluginsBefore = [];
+    pluginsAfter = [];
 
     constructor(options = {
         // cardWidth: 55,
@@ -52,6 +69,18 @@ class PDFy {
 
     border(h, w) {
         this.borders.push({h, w});
+
+        return this;
+    }
+
+    registerPluginBefore(plugin) {
+        this.pluginsBefore.push(plugin);
+
+        return this;
+    }
+
+    registerPluginAfter(plugin) {
+        this.pluginsAfter.push(plugin);
 
         return this;
     }
@@ -97,23 +126,14 @@ class PDFy {
         cards
             // .filter(c => c.done !== true)
             .forEach((card, cardIndex, cardArray) => {
-                // doc.page.margins = {
-                //     top: 0,
-                //     bottom: 0,
-                //     left: 0,
-                //     right: 0,
-                // };
+
+                const pluginContext = {
+                    width: doc.page.width,
+                    height: doc.page.height,
+                }
+                this.pluginsBefore.forEach(plugin => plugin.apply(doc, card, cardIndex, pluginContext));
 
                 doc.rect(pX, pY, pW, pH).stroke();
-
-                // let epic = card.epic;
-                // epic = epic ? `(${epic.substr(0, 40) + (epic.length > 40 ? '...' : '')})` : ' ';
-                // doc.fontSize(subtitleFont);
-                // doc.text(epic, pX + x * w + cX / 2, pY + y * h + cY, {width: (w - cX), align: 'center', lineGap: 10});
-                //
-                // // doc.fontSize(card.title.length < 85 ? titleFont : 10);
-                // doc.fontSize(titleFont);
-                // doc.text(card.title, {width: (w - 2 * cX), align: 'left'});
 
                 card.areas(context).forEach(area => {
                     if (area.fontSize) doc.fontSize(area.fontSize);
@@ -171,26 +191,11 @@ class PDFy {
                     ;
                 })
 
+                this.pluginsAfter.forEach(plugin => plugin.apply(doc, card, cardIndex, pluginContext));
+
                 if (cardIndex + 1 < cardArray.length) {
                     doc.addPage();
                 }
-
-                // if (card.description) {
-                //     doc.fontSize(descriptionFont);
-                //     doc.text(' ');
-                //     card.description.forEach(d => {
-                //         doc.text(d, {width: (w - 2 * cX), align: 'left'});
-                //     });
-                // }
-
-                // if (options.withNumber) {
-                //     doc.fontSize(subtitleFont);
-                //     doc.text(i, pX + x * w + cX / 2, pY + (y + 1) * h - cY, {
-                //         width: (w - cX),
-                //         align: 'right',
-                //         lineGap: 10
-                //     });
-                // }
 
             });
 
@@ -292,6 +297,87 @@ class PDFySizingMPCJumbo extends PDFySizing {
     }
 }
 
+class PDFyPluginPoker extends PDFyPlugin {
+
+    suitPicturesByIndex = {};
+    suitColorsByIndex = {};
+
+    constructor(options = {}) {
+        super();
+
+        this.suitPicturesByIndex = options.suitPicturesByIndex || {
+            0: './resources/pictures/suits/handy/club.png',
+            1: './resources/pictures/suits/handy/diamond.png',
+            2: './resources/pictures/suits/handy/heart.png',
+            3: './resources/pictures/suits/handy/spade.png',
+        };
+        this.suitColorsByIndex = options.suitPicturesByIndex || {
+            0: 'black', // club
+            1: 'red', // diamond
+            2: 'red', // heart
+            3: 'black', // spade
+        };
+        this.courtValues = options.courtValues;
+        if (!this.courtValues) {
+            if (options.language === 'fr') {
+                this.courtValues = {
+                    10: 'V',
+                    11: 'D',
+                    12: 'R',
+                };
+            } else {
+                this.courtValues = {
+                    10: 'J',
+                    11: 'Q',
+                    12: 'K',
+                };
+            }
+        }
+    }
+
+    /**
+     * @param i - 0-based
+     */
+    toValue(i) {
+        if (i === 0) return 'A';
+        if (i < 10) return '' + (i + 1);
+        return this.courtValues[i] || ('' + i);
+    };
+
+    toSuit(i) {
+        const picture = this.suitPicturesByIndex[i] || ('' + i);
+        const color = this.suitColorsByIndex[i] || ('' + i);
+        return {picture, color};
+    }
+
+    doApply(doc, card, cardIndex, context = {}) {
+        if (cardIndex === 0) {
+            doc.registerFont('JQKAs Wild Font', './resources/fonts/JqkasWild-w1YD6.ttf');
+        }
+        const size = 13;
+        const no = this.toValue(cardIndex % size);
+        const {picture, color} = this.toSuit(Math.trunc(cardIndex / size));
+
+        const x = 65;
+        const y = 75;
+
+        // doc.rect(x, y, 120, 50).undash().lineWidth(10).stroke();
+
+        doc
+            .fillColor(color)
+            .fontSize(130)
+            .font('JQKAs Wild Font')
+            .text(no, x, y, {width: 120, align: 'center'})
+        ;
+
+        doc.image(picture, x, y + 124, {width: 120});
+    }
+
+}
+
+
 module.exports.PDFCard = PDFCard;
 module.exports.PDFy = PDFy;
 module.exports.PDFySizingMPCJumbo = PDFySizingMPCJumbo;
+module.exports.PDFyPlugin = PDFyPlugin;
+module.exports.PDFyPluginPoker = PDFyPluginPoker;
