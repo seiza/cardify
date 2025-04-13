@@ -297,7 +297,7 @@ class PDFySizingMPCJumbo extends PDFySizing {
     }
 }
 
-class PDFyPluginPoker extends PDFyPlugin {
+class PDFyPluginPokerHandy extends PDFyPlugin {
 
     suitPicturesByIndex = {};
     suitColorsByIndex = {};
@@ -306,10 +306,10 @@ class PDFyPluginPoker extends PDFyPlugin {
         super();
 
         this.suitPicturesByIndex = options.suitPicturesByIndex || {
-            0: './resources/pictures/suits/handy/club.png',
+            0: './resources/pictures/suits/handy/spade.png',
             1: './resources/pictures/suits/handy/diamond.png',
             2: './resources/pictures/suits/handy/heart.png',
-            3: './resources/pictures/suits/handy/spade.png',
+            3: './resources/pictures/suits/handy/club.png',
         };
         this.suitColorsByIndex = options.suitPicturesByIndex || {
             0: 'black', // club
@@ -361,6 +361,9 @@ class PDFyPluginPoker extends PDFyPlugin {
         const x = 65;
         const y = 75;
 
+        const _w = doc.page.width;
+        const _h = doc.page.height;
+
         // doc.rect(x, y, 120, 50).undash().lineWidth(10).stroke();
 
         doc
@@ -371,6 +374,14 @@ class PDFyPluginPoker extends PDFyPlugin {
         ;
 
         doc.image(picture, x, y + 124, {width: 120});
+
+        doc
+            .save()
+            .rotate(180, {origin: [_w / 2, _h / 2]})
+            .text(no, x, y, {width: 120, align: 'center'})
+            .image(picture, x, y + 124, {width: 120})
+            .restore()
+        ;
     }
 
 }
@@ -380,4 +391,4 @@ module.exports.PDFCard = PDFCard;
 module.exports.PDFy = PDFy;
 module.exports.PDFySizingMPCJumbo = PDFySizingMPCJumbo;
 module.exports.PDFyPlugin = PDFyPlugin;
-module.exports.PDFyPluginPoker = PDFyPluginPoker;
+module.exports.PDFyPluginPokerHandy = PDFyPluginPokerHandy;
