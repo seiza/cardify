@@ -144,8 +144,10 @@ class PDFy {
                     // const h = area.h && (pH * area.h);
                     const options = {width, align};
 
+                    const fillColor = area.fontColor || 'black';
+
                     doc
-                        .fillColor('black')
+                        .fillColor(fillColor)
                         .font('Times-Roman')
                     // .font('Spartacus')
                     ;
@@ -345,8 +347,10 @@ class PDFyPluginPokerHandy extends PDFyPlugin {
     };
 
     toSuit(i) {
-        const picture = this.suitPicturesByIndex[i] || ('' + i);
-        const color = this.suitColorsByIndex[i] || ('' + i);
+        const picture = this.suitPicturesByIndex[i];
+        if (!picture) throw new Error(`No Suit's picture defined for index=${i}`)
+        const color = this.suitColorsByIndex[i];
+        if (!color) throw new Error(`No Suit's color defined for index=${i}`)
         return {picture, color};
     }
 
@@ -354,34 +358,38 @@ class PDFyPluginPokerHandy extends PDFyPlugin {
         if (cardIndex === 0) {
             doc.registerFont('JQKAs Wild Font', './resources/fonts/JqkasWild-w1YD6.ttf');
         }
-        const size = 13;
-        const no = this.toValue(cardIndex % size);
-        const {picture, color} = this.toSuit(Math.trunc(cardIndex / size));
+        try {
+            const size = 13;
+            const no = this.toValue(cardIndex % size);
+            const {picture, color} = this.toSuit(Math.trunc(cardIndex / size));
 
-        const x = 65;
-        const y = 75;
+            const x = 67;
+            const y = 75;
 
-        const _w = doc.page.width;
-        const _h = doc.page.height;
+            const _w = doc.page.width;
+            const _h = doc.page.height;
 
-        // doc.rect(x, y, 120, 50).undash().lineWidth(10).stroke();
+            // doc.rect(x, y, 120, 50).undash().lineWidth(10).stroke();
 
-        doc
-            .fillColor(color)
-            .fontSize(130)
-            .font('JQKAs Wild Font')
-            .text(no, x, y, {width: 120, align: 'center'})
-        ;
+            doc
+                .fillColor(color)
+                .fontSize(130)
+                .font('JQKAs Wild Font')
+                .text(no, x - 10, y, {width: 120, align: 'center'})
+                .image(picture, x + 5, y + 124, {width: 90})
+            ;
 
-        doc.image(picture, x, y + 124, {width: 120});
-
-        doc
-            .save()
-            .rotate(180, {origin: [_w / 2, _h / 2]})
-            .text(no, x, y, {width: 120, align: 'center'})
-            .image(picture, x, y + 124, {width: 120})
-            .restore()
-        ;
+            doc
+                .save()
+                .rotate(180, {origin: [_w / 2, _h / 2]})
+                .text(no, x - 10, y, {width: 120, align: 'center'})
+                .image(picture, x + 5, y + 124, {width: 90})
+                .restore()
+            ;
+        } catch (e) {
+            console.error('>> [ERROR] ', {cardIndex, card});
+            throw e;
+        }
     }
 
 }
